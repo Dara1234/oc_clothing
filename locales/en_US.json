@@ -62,9 +62,9 @@
   "survey": {
     "prompt": "Hi, want to get quick feedback on your recent experience with {{agentFirstName}}",
     "positive": "Thanks for the feedback",
-    "neutral": "Thanks for the feedback, if there something we should improve feel free to comment with #suggestion",
+    "neutral": "Thanks for the feedback, if there something we should improve feel free to comment with #feedback",
     "negative": "Thanks for telling us. Sorry to hear that, if there something we can do to turn this let us know",
-    "suggestion": "Your suggestion has been recorded for future review by the team. If this is something we need to get back to you right now just comment \"help\""
+    "suggestion": "Your feedback has been recorded for future review by the team. If this is something we need to get back to you right now just comment \"help\""
   },
   "chat_plugin": {
     "prompt": "Thanks for visiting our store, be sure to check out all the great styles we have on the summer section."

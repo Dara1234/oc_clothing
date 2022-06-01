@@ -18,6 +18,22 @@ const Curation = require("./curation"),
   GraphApi = require("./graph-api"),
   i18n = require("../i18n.config");
 
+  var admin = require("firebase-admin");
+
+  var serviceAccount = require("/Users/dara/Documents/Interviews/original-coast-clothing/oc-clothing-firebase-adminsdk-nhawq-b035b2c419.json");
+  
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://oc-clothing-default-rtdb.asia-southeast1.firebasedatabase.app"
+  });
+
+  // Import Admin SDK
+const { getDatabase } = require('firebase-admin/database');
+
+// Get a database reference to our blog
+const db = getDatabase();
+const ref = db.ref('server/saving-data/fireblog');
+
 module.exports = class Receive {
   constructor(user, webhookEvent, isUserRef) {
     this.user = user;
@@ -75,9 +91,19 @@ module.exports = class Receive {
       "Received text:",
       `${this.webhookEvent.message.text} for ${this.user.psid}`
     );
-
+    var Sentiment = require('sentiment');
+    var sentiment = new Sentiment();
+    var result = sentiment.analyze(this.webhookEvent.message.text.replace('#feedback',''));
+    console.dir(result);
     let event = this.webhookEvent;
-
+    const usersRef = ref.child('feedback');
+    usersRef.set({
+      res: {
+        user_id: this.user.psid,
+        sentiment_score: result.score,
+        text: this.webhookEvent.message.text.replace('#feedback','')
+      }
+    });
     // check greeting is here and is confident
     let greeting = this.firstEntity(event.message.nlp, "greetings");
     let message = event.message.text.trim().toLowerCase();
@@ -91,7 +117,7 @@ module.exports = class Receive {
       response = Response.genNuxMessage(this.user);
     } else if (Number(message)) {
       response = Order.handlePayload("ORDER_NUMBER");
-    } else if (message.includes("#")) {
+    } else if (message.includes("#feedback")) {
       response = Survey.handlePayload("CSAT_SUGGESTION");
     } else if (message.includes(i18n.__("care.help").toLowerCase())) {
       let care = new Care(this.user, this.webhookEvent);
