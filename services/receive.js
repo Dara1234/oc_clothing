@@ -87,22 +87,27 @@ module.exports = class Receive {
 
   // Handles messages events with text
   handleTextMessage() {
+    var Sentiment = require('sentiment');
+    var randomId = require('random-id');
+
+    var sentiment = new Sentiment();
+    var len = 30;
+    var pattern = 'aA0'
+    var id = randomId(len, pattern)
+
     console.log(
       "Received text:",
       `${this.webhookEvent.message.text} for ${this.user.psid}`
     );
-    var Sentiment = require('sentiment');
-    var sentiment = new Sentiment();
+    
     var result = sentiment.analyze(this.webhookEvent.message.text.replace('#feedback',''));
     console.dir(result);
     let event = this.webhookEvent;
-    const usersRef = ref.child('feedback');
+    const usersRef = ref.child(id);
     usersRef.set({
-      res: {
         user_id: this.user.psid,
         sentiment_score: result.score,
         text: this.webhookEvent.message.text.replace('#feedback','')
-      }
     });
     // check greeting is here and is confident
     let greeting = this.firstEntity(event.message.nlp, "greetings");
